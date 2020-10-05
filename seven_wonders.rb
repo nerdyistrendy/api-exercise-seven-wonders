@@ -8,15 +8,24 @@ Dotenv.load
 BASE_URL = "https://us1.locationiq.com/v1/search.php"
 LOCATION_IQ_KEY = ENV["key"]
 
+class SearchError < StandardError; end
+
 def get_location(search_term)
   query= {
       key: LOCATION_IQ_KEY,
       q: search_term,
       format: "json"
   }
+
   response = HTTParty.get(BASE_URL, query: query)
+
+  unless response.code == 200
+    raise SearchError, "Cannot find #{search_term}"
+  end
+
   location = {search_term => {:lat => response[0]["lat"],
-                              :lon => response[0]["lon"]}}
+                              :lon => response[0]["lon"]
+                              }}
   return location
 end
 
@@ -37,7 +46,7 @@ end
 def driving_directions(coordinates)
   url = "https://us1.locationiq.com/v1/directions/driving/#{coordinates}"
   query= {key: LOCATION_IQ_KEY}
-  sleep(0.5)
+  sleep(1.0)
   response = HTTParty.get(url, query: query)
   return response
 end
