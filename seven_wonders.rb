@@ -1,10 +1,18 @@
 require 'httparty'
 require "awesome_print"
 
-BASE_URL = "THE BASE URL FOR THE API REQUEST"
-LOCATION_IQ_KEY = "YOUR API TOKEN"
+BASE_URL = "https://us1.locationiq.com/v1/search.php?"
+LOCATION_IQ_KEY = "3a04b55f0bc2c1"
 
 def get_location(search_term)
+  query= {
+      key: LOCATION_IQ_KEY,
+      q: search_term,
+      format: "json"
+  }
+  response = HTTParty.get(BASE_URL, query: query)
+  location = {search_term => {:lat => response[0]["lat"], :lon => response[0]["lon"]}}
+  return location
 
 end
 
@@ -22,6 +30,7 @@ def find_seven_wonders
   return seven_wonders_locations
 end
 
+get_location("Great Pyramid of Giza")
 
 # Use awesome_print because it can format the output nicely
 ap find_seven_wonders
