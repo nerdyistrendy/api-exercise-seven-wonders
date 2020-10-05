@@ -33,7 +33,9 @@ end
 def driving_directions(coordinates)
   url = "https://us1.locationiq.com/v1/directions/driving/#{coordinates}"
   query= {key: LOCATION_IQ_KEY}
-  p response = HTTParty.get(url, query: query)
+  sleep(0.5)
+  response = HTTParty.get(url, query: query)
+  return response
 end
 
 def get_coordinates(search1, search2)
@@ -43,9 +45,33 @@ def get_coordinates(search1, search2)
   return coordinates
 end
 
+
+def coordinates_to_name(locations)
+  url = 'https://us1.locationiq.com/v1/reverse.php'
+  place_name = []
+  locations.each do |location|
+    lat = location[:lat]
+    lon = location[:lon]
+    query= {
+        key: LOCATION_IQ_KEY,
+        lat: lat,
+        lon: lon,
+        format: "json"
+    }
+    sleep(0.5)
+    place_name << {location => HTTParty.get(url, query: query)["display_name"]}
+  end
+  return place_name
+end
+
 # Use awesome_print because it can format the output nicely
-# ap find_seven_wonders
+ap find_seven_wonders
 # Expecting something like:
 # [{"Great Pyramid of Giza"=>{:lat=>"29.9791264", :lon=>"31.1342383751015"}}, {"Gardens of Babylon"=>{:lat=>"50.8241215", :lon=>"-0.1506162"}}, {"Colossus of Rhodes"=>{:lat=>"36.3397076", :lon=>"28.2003164"}}, {"Pharos of Alexandria"=>{:lat=>"30.94795585", :lon=>"29.5235626430011"}}, {"Statue of Zeus at Olympia"=>{:lat=>"37.6379088", :lon=>"21.6300063"}}, {"Temple of Artemis"=>{:lat=>"32.2818952", :lon=>"35.8908989553238"}}, {"Mausoleum at Halicarnassus"=>{:lat=>"37.03788265", :lon=>"27.4241455276707"}}]
+
 coordinates = get_coordinates("Cairo Egypt", "Great Pyramid of Giza")
-ap driving_directions(coordinates)
+puts driving_directions(coordinates)
+
+locations = [{ lat: 38.8976998, lon: -77.0365534886228}, {lat: 48.4283182, lon: -123.3649533 }, { lat: 41.8902614, lon: 12.493087103595503}]
+ap coordinates_to_name(locations)
+
